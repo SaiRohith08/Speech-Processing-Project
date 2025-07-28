@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fake Audio Detection Lab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            font-family: 'Google Sans', sans-serif;
+            padding: 50px;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 36px;
+            color: #00ffe7;
+            margin-bottom: 40px;
+            letter-spacing: 1px;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        #upload-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        #upload-btn img {
+            width: 140px;
+            filter: drop-shadow(0 0 10px #00ffe7);
+            transition: transform 0.3s, filter 0.3s;
+        }
+
+        #upload-btn img:hover {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px #00ffe7);
+        }
+
+        input[type="submit"] {
+            margin-top: 20px;
+            padding: 10px 25px;
+            background-color: #00ffe7;
+            color: #000;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 6px;
+            box-shadow: 0 0 15px #00ffe7;
+            transition: background 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #00c7ba;
+        }
+
+        .result-display, .error-display {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0, 255, 231, 0.3);
+        }
+
+        .result-display {
+            background: rgba(0, 255, 231, 0.1);
+            color: #00ffe7;
+        }
+
+        .error-display {
+            background: rgba(255, 0, 80, 0.1);
+            color: #ff4f78;
+            box-shadow: 0 0 25px rgba(255, 0, 80, 0.3);
+        }
+
+        .audio-player{
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .audio-player audio {
+            width: 80%;
+        }
+
+        /* Hide file input */
+        #file-upload {
+            display: none;
+        }
+
+        #file-name {
+            margin-top: 15px;
+            color: #00ffe7;
+            font-size: 16px;
+            min-height: 24px;
+        }
+    </style>
+</head>
+<body>
+    <h2>🔍 Fake Audio Detection Lab</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="file-upload" id="upload-btn">
+            <img src="{{ url_for('static', filename='upload_icon.png') }}" alt="Upload Audio">
+        </label>
+        <input id="file-upload" type="file" name="audio" accept=".flac" required onchange="updateFileName(this)">
+        <div id="file-name"></div>
+        <br>
+        <input type="submit" value="Analyze Audio">
+    </form>
+
+    <script>
+        function updateFileName(input) {
+            const fileNameDisplay = document.getElementById('file-name');
+            if (input.files.length > 0) {
+                fileNameDisplay.textContent = 'Selected file: ' + input.files[0].name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        }
+    </script>
+
+    {% if result %}
+        <div class="result-display">
+            Audio Prediction: {{ result }}<br>
+            Confidence Meter: {{ confidence | round(3) }}
+        </div>
+
+        <div class="audio-player">
+            <audio controls>
+                <source src="{{ url_for('static', filename='uploads/' ~ filename) }}" type="audio/flac">
+                Your browser does not support the audio element.
+            </audio>
+        </div>
+
+    {% elif error %}
+        <div class="error-display">
+            ❌ Error: {{ error }}
+        </div>
+    {% endif %}
+</body>
+</html>
